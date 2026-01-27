@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Note;
 use Illuminate\Http\Request;
 
 class NotesController extends Controller
@@ -11,7 +12,10 @@ class NotesController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $notes = Note::with('user')
+            ->get();
+
+        return view('home', ['notes' => $notes]);
     }
 
     /**
@@ -27,7 +31,17 @@ class NotesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title'=>'required|string',
+            'content'=>'required|string'
+        ], [
+            'title.required'=>'Een titel is wel nodig',
+            'content.required'=>'Je moet wel wat in de inhoud zetten'
+        ]);
+
+        auth()->user()->notes()->create($validated);
+
+        return redirect('/')->with('success', 'Notitie is aangemaakt');
     }
 
     /**
