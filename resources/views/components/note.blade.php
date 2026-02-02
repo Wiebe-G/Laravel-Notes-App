@@ -1,5 +1,25 @@
-@props(['notes'])
+@props(['note'])
 
 <div class="card bg-base-100 shadow">
-    Test\
+	<div class="card-body">
+		<div class="flex flex-col space-x-3 text-center">
+			<h1 class="font-semibold">{{ $note->title }}</h1>
+			<p>{{ $note->content }}</p>
+
+			<div class="flex gap-1">
+				<span>Gemaakt om {{ $note->created_at->diffForHumans() }}</span>
+				<a href="/notes?{{ $note->id }}/edit" class="btn btn-ghost btn-xs">
+					Bewerk notitie
+				</a>
+				<form method="POST" action="/notes/{{ $note->id }}">
+					@csrf
+					@method('DELETE')
+					<button type="submit" onclick="return confirm('Weet je zeker dat je deze notitie wil verwijderen?')"
+						class="btn btn-ghost btn-xs text-error">
+						Verwijder
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>

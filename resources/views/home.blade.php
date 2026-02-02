@@ -4,26 +4,52 @@
 	</x-slot:title>
 
 	@auth
-		<div class="grid h-full grid-cols-[1fr_3fr] gap-4">
-			<div class="left-0 h-full shadow">
-				<span class="font-bold">Notities van {{ auth()->user()->name }}</span>
-				@forelse ($notes as $note)
-					{{-- Maak dit ook echt een link die de notitie inhoud op juiste plek zet
-                en maak het design wat beter --}}
-					<div>{{ $note->title }}</div>
-				@empty
-					<div>Geen notities gevonden</div>
-				@endforelse
+		<h1 class="bg-base-100 text-center font-bold shadow">Notities van {{ auth()->user()->name }}
+		</h1>
+		{{-- ({{ auth()->user()->notes()->count() }}) --}}
+		<div class="grid h-full grid-cols-4 gap-4">
+			<div class="card-body bg-base-100 shadow">
+				<h1>Nieuwe notitie</h1>
+				<form method="POST" action="/notes">
+					@csrf
+					<div class="form-control w-full text-black">
+						<textarea name="title" id="NoteTitle" placeholder="Titel"
+						 class="textarea textarea-bordered @error('message') textarea-error
+					@enderror w-full resize-none" rows="4"
+						 {{ old('message') }} maxlength="250" required>
+					 </textarea>
 
+						<textarea name="content" id="NoteBody" placeholder="Content"
+						 class="textarea textarea-bordered @error('message') textarea-error
+					@enderror w-full resize-none" rows="4"
+						 {{ old('message') }} maxlength="2000" required></textarea>
+
+						@error('message')
+							<div class="label">
+								<span class="label-text-alt text-error">{{ $message }}</span>
+							</div>
+						@enderror
+
+						<div class="mt-4 flex items-center justify-end">
+							<button type="submit" class="btn btn-primary btn-sm">
+								Sla op
+							</button>
+						</div>
+					</div>
+				</form>
 			</div>
-			<div id="UserNotesDisplayed" class="flex flex-col justify-center">
-				<textarea name="Notitie-Title" id="NotitieTitel" placeholder="Titel van notitie" class="resize-none text-center">
-                </textarea>
-				<textarea name="Notitie-Content" id="NotitieContent" placeholder="Contents van notitie"
-				 class="h-full w-full resize-none">
-                </textarea>
-				<button type="submit" class="btn btn-ghost">Sla op</button>
-			</div>
+			@forelse($notes as $note)
+				<x-note :note="$note" />
+			@empty
+				{{-- Maak het zodat dit een animatie speelt en een modal in het scherm opent --}}
+				<h1>Geen notities </h1>
+			@endforelse
+			<dialog id="NoteDialog">
+				<textarea name="NoteTitle" id="NoteTitle" placeholder="Titel"></textarea>
+				<form method="dialog">
+					<button type="submit">Sla op</button>
+				</form>
+			</dialog>
 		</div>
 	@else
 		<div class="card-body items-center text-center">
